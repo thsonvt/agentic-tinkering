@@ -39,3 +39,8 @@ This is a Docusaurus 3.9.2 site using the classic preset with React 19 and TypeS
 - Uses `@easyops-cn/docusaurus-search-local` for client-side search
 - Search index is generated at build time (not available in dev mode)
 - Indexes docs and blog content; configured in `docusaurus.config.ts` under `themes`
+
+**Deployment:**
+- Configured for Netlify via `netlify.toml`
+- Build command: `npm run build`, publish directory: `build`
+- Auto-deploys on push to connected GitHub repo
