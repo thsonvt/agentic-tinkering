@@ -3,8 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Welcome to my documentation',
+  title: 'Agentic Tinkering',
+  tagline: 'Welcome to my learning journey with AI agents',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -12,7 +12,7 @@ const config: Config = {
   },
 
   // TODO: Update with your production URL
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://agentic-tinkering.netlify.app/',
   baseUrl: '/',
 
   onBrokenLinks: 'throw',
@@ -65,9 +65,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'My Site',
+      title: 'Agentic Tinkering',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Agentic Tinkering',
         src: 'img/logo.svg',
       },
       items: [

@@ -4,6 +4,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
+import SubscribeForm from '@site/src/components/SubscribeForm';
 
 import styles from './index.module.css';
 
@@ -35,6 +36,9 @@ export default function Home(): ReactNode {
       title={siteConfig.title}
       description={siteConfig.tagline}>
       <HomepageHeader />
+      <main>
+        <SubscribeForm />
+      </main>
     </Layout>
   );
 }
