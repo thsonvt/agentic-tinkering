@@ -1,0 +1,55 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.container h1 {
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 2rem;
+}
+
+.empty {
+  color: var(--ifm-color-emphasis-600);
+  font-style: italic;
+}
+
+.draftList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.draftCard {
+  display: block;
+  padding: 1.5rem;
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.draftCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+}
+
+.draftCard h3 {
+  margin: 0 0 0.5rem;
+  color: var(--ifm-font-color-base);
+}
+
+.draftCard p {
+  margin: 0 0 0.5rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.date {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-600);
+}

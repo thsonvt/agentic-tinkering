@@ -78,6 +78,14 @@ const config: Config = {
           label: 'Docs',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
+        {
+          type: 'custom-draftsNavItem',
+          position: 'left',
+        },
+        {
+          type: 'custom-authButton',
+          position: 'right',
+        },
       ],
     },
     footer: {

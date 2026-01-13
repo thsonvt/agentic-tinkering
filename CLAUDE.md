@@ -44,3 +44,15 @@ This is a Docusaurus 3.9.2 site using the classic preset with React 19 and TypeS
 - Configured for Netlify via `netlify.toml`
 - Build command: `npm run build`, publish directory: `build`
 - Auto-deploys on push to connected GitHub repo
+
+**Authentication (Netlify Identity):**
+- `src/contexts/AuthContext.tsx` - Auth state management
+- `src/theme/Root.tsx` - Wraps app with AuthProvider
+- `src/components/AuthButton/` - Login/logout button in navbar
+- Custom navbar items registered in `src/theme/NavbarItem/ComponentTypes.tsx`
+
+**Drafts (Protected Content):**
+- `/src/pages/drafts/` - Protected draft pages (only visible when logged in)
+- `src/components/ProtectedContent/` - Wrapper component for auth-protected content
+- `src/components/DraftsNavItem/` - Navbar link that only shows when authenticated
+- To add drafts: create page in `/src/pages/drafts/`, wrap with `<ProtectedContent>`, add to drafts array in `index.tsx`

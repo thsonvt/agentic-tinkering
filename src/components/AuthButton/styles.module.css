@@ -1,0 +1,27 @@
+.authContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userName {
+  font-size: 0.875rem;
+  color: var(--ifm-navbar-link-color);
+}
+
+.authButton {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifm-color-primary);
+  background: transparent;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.authButton:hover {
+  color: #fff;
+  background: var(--ifm-color-primary);
+}
