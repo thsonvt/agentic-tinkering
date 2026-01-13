@@ -7,6 +7,11 @@ const config: Config = {
   tagline: 'Welcome to my learning journey with AI agents',
   favicon: 'img/favicon.ico',
 
+  customFields: {
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+  },
+
   future: {
     v4: true,
   },

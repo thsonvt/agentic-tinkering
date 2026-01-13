@@ -1,4 +1,7 @@
 import React, {createContext, useContext, useState, useEffect, ReactNode} from 'react';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import {getSupabaseClient} from '@site/src/lib/supabase';
+import type {User as SupabaseUser, SupabaseClient} from '@supabase/supabase-js';
 
 interface User {
   email: string;
@@ -16,49 +19,83 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function mapSupabaseUser(supabaseUser: SupabaseUser | null): User | null {
+  if (!supabaseUser) return null;
+  return {
+    email: supabaseUser.email || '',
+    user_metadata: {
+      full_name: supabaseUser.user_metadata?.full_name,
+    },
+  };
+}
+
 export function AuthProvider({children}: {children: ReactNode}) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [netlifyIdentity, setNetlifyIdentity] = useState<any>(null);
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
+  const {siteConfig} = useDocusaurusContext();
 
   useEffect(() => {
-    // Only run on client side
     if (typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
 
-    import('netlify-identity-widget').then((identity) => {
-      identity.init();
-      setNetlifyIdentity(identity);
+    const {supabaseUrl, supabaseAnonKey} = siteConfig.customFields as {
+      supabaseUrl?: string;
+      supabaseAnonKey?: string;
+    };
 
-      const currentUser = identity.currentUser();
-      if (currentUser) {
-        setUser(currentUser);
-      }
+    const client = getSupabaseClient(supabaseUrl, supabaseAnonKey);
+    if (!client) {
       setIsLoading(false);
+      return;
+    }
 
-      identity.on('login', (loggedInUser: User) => {
-        setUser(loggedInUser);
-        identity.close();
-      });
+    setSupabase(client);
 
-      identity.on('logout', () => {
-        setUser(null);
-      });
+    // Get initial session
+    client.auth.getSession().then(({data: {session}}) => {
+      setUser(mapSupabaseUser(session?.user ?? null));
+      setIsLoading(false);
     });
-  }, []);
 
-  const login = () => {
-    if (netlifyIdentity) {
-      netlifyIdentity.open('login');
+    // Listen for auth changes
+    const {data: {subscription}} = client.auth.onAuthStateChange((_event, session) => {
+      setUser(mapSupabaseUser(session?.user ?? null));
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [siteConfig.customFields]);
+
+  const login = async () => {
+    if (!supabase) {
+      console.warn('Supabase not initialized');
+      return;
+    }
+
+    const email = window.prompt('Enter your email:');
+    if (!email) return;
+
+    const {error} = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      alert(`Login error: ${error.message}`);
+    } else {
+      alert('Check your email for a login link!');
     }
   };
 
-  const logout = () => {
-    if (netlifyIdentity) {
-      netlifyIdentity.logout();
-    }
+  const logout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
   };
 
   return (
