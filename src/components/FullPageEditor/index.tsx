@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useHistory } from '@docusaurus/router';
 import MDEditor, { commands, ICommand } from '@uiw/react-md-editor';
 import styles from './styles.module.css';
+import { htmlToMarkdown } from '@site/src/utils/htmlToMarkdown';
 
 // Custom highlight command
 const highlightCommand: ICommand = {
@@ -207,6 +208,35 @@ export default function FullPageEditor({
     await performSave();
   };
 
+  const handleEditorPaste = useCallback(
+    (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      const html = e.clipboardData.getData('text/html');
+      if (!html) return;
+
+      const markdown = htmlToMarkdown(html);
+      if (!markdown.trim()) return;
+
+      e.preventDefault();
+
+      const target = e.currentTarget;
+      const selectionStart = typeof target.selectionStart === 'number' ? target.selectionStart : content.length;
+      const selectionEnd = typeof target.selectionEnd === 'number' ? target.selectionEnd : content.length;
+
+      const nextContent = `${content.slice(0, selectionStart)}${markdown}${content.slice(selectionEnd)}`;
+      setContent(nextContent);
+
+      const nextCursor = selectionStart + markdown.length;
+      requestAnimationFrame(() => {
+        try {
+          target.setSelectionRange(nextCursor, nextCursor);
+        } catch {
+          // Ignore selection errors (e.g. element unmounted)
+        }
+      });
+    },
+    [content]
+  );
+
   const handleDelete = async () => {
     if (!onDelete) return;
     if (!confirm('Are you sure you want to delete this content?')) return;
@@ -389,6 +419,7 @@ export default function FullPageEditor({
             height={focusMode ? window.innerHeight - 80 : window.innerHeight - 200}
             textareaProps={{
               placeholder: 'Start writing...',
+              onPaste: handleEditorPaste,
             }}
             commands={[
               commands.bold,
