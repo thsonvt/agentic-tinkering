@@ -1,23 +1,187 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.hero {
+  background: linear-gradient(
+    180deg,
+    rgba(46, 125, 91, 0.10) 0%,
+    rgba(46, 125, 91, 0.00) 70%
+  );
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
+.heroInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 3rem;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3rem;
+  align-items: center;
 }
 
-.buttons {
+.heroText {
+  min-width: 0;
+}
+
+.heroTitle {
+  font-size: 3rem;
+  line-height: 1.05;
+  margin: 0 0 1rem;
+}
+
+.heroSubtitle {
+  font-size: 1.15rem;
+  color: var(--ifm-color-emphasis-700);
+  margin: 0 0 1.75rem;
+  max-width: 44rem;
+}
+
+.heroCtas {
   display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: 44px;
+  padding: 0 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.primaryButton {
+  background: var(--ifm-color-primary);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.primaryButton:hover {
+  background: var(--ifm-color-primary-dark);
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.secondaryButton {
+  background: var(--ifm-color-emphasis-100);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.secondaryButton:hover {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.heroArt {
+  display: flex;
+  justify-content: center;
+}
+
+.heroArtSvg {
+  width: min(420px, 100%);
+  height: auto;
+  opacity: 0.9;
+}
+
+.section,
+.sectionAlt {
+  padding: 3rem 1.5rem;
+}
+
+.sectionAlt {
+  background: var(--ifm-color-emphasis-100);
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.sectionInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitle {
+  margin: 0 0 1.75rem;
+  color: var(--ifm-color-emphasis-700);
+  max-width: 52rem;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: block;
+  padding: 1.25rem 1.25rem 1rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 16px;
+  background: var(--ifm-background-color);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: rgba(46, 125, 91, 0.35);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardTitle {
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.cardDescription {
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.cardCta {
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+.subscribeHeader {
+  display: flex;
+  flex-direction: column;
+}
+
+.subscribeCard {
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 16px;
+  padding: 1.25rem;
+  background: var(--ifm-background-color);
+}
+
+@media (max-width: 996px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+    padding: 3.25rem 1.25rem 2.5rem;
+    gap: 2rem;
+  }
+
+  .heroTitle {
+    font-size: 2.4rem;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
 }

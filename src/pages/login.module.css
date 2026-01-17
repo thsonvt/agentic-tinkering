@@ -1,0 +1,140 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem;
+}
+
+.card {
+  background: var(--ifm-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 12px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.subtitle {
+  color: var(--ifm-color-emphasis-700);
+  margin: 0 0 2rem;
+  font-size: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+  margin-bottom: -0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px var(--ifm-color-primary-lightest);
+}
+
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: var(--ifm-color-emphasis-500);
+}
+
+.codeInput {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 1.75rem;
+  text-align: center;
+  letter-spacing: 0.75rem;
+  padding: 1.25rem;
+}
+
+.error {
+  color: var(--ifm-color-danger);
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--ifm-color-danger-contrast-background);
+  border-radius: 6px;
+}
+
+.success {
+  color: var(--ifm-color-success);
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--ifm-color-success-contrast-background);
+  border-radius: 6px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--ifm-color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: var(--ifm-color-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  transition: color 0.2s;
+}
+
+.backButton:hover:not(:disabled) {
+  color: var(--ifm-color-primary-dark);
+  text-decoration: underline;
+}
+
+.backButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

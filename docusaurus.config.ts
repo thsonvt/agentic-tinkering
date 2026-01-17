@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config({path: '.env.local'});
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
@@ -8,8 +10,7 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   customFields: {
-    supabaseUrl: process.env.SUPABASE_URL,
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+    convexUrl: process.env.CONVEX_URL,
   },
 
   future: {
@@ -32,18 +33,18 @@ const config: Config = {
       'classic',
       {
         docs: {
+          routeBasePath: 'content',
           sidebarPath: './sidebars.ts',
+          remarkPlugins: [require('./remark/youtubeEmbed')],
+          exclude: [
+            '**/plans/**',
+            '**/_*.{js,jsx,ts,tsx,md,mdx}',
+            '**/_*/**',
+            '**/*.test.{js,jsx,ts,tsx}',
+            '**/__tests__/**',
+          ],
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -57,7 +58,7 @@ const config: Config = {
       {
         hashed: true,
         indexDocs: true,
-        indexBlog: true,
+        indexBlog: false,
         indexPages: false,
         language: ['en'],
       },
@@ -68,6 +69,12 @@ const config: Config = {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       respectPrefersColorScheme: true,
+    },
+    docs: {
+      sidebar: {
+        hideable: true,
+        autoCollapseCategories: true,
+      },
     },
     navbar: {
       title: 'Agentic Tinkering',
@@ -80,9 +87,9 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Docs',
+          label: 'Content',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {to: '/posts', label: 'Posts', position: 'left'},
         {
           type: 'custom-draftsNavItem',
           position: 'left',

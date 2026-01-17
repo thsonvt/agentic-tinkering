@@ -1,0 +1,159 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  padding: 1rem;
+  /* Force new compositing layer to ensure proper stacking */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.modal {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Dark mode support */
+[data-theme='dark'] .modal {
+  background: var(--ifm-background-color);
+}
+
+.modal h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  color: var(--ifm-color-emphasis-700);
+  margin: 0 0 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+  margin-bottom: -0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px var(--ifm-color-primary-lightest);
+}
+
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.slugPreview {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.slugInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--ifm-font-color-base);
+  padding: 0;
+  margin: 0;
+}
+
+.slugInput:focus {
+  outline: none;
+}
+
+.error {
+  color: var(--ifm-color-danger);
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--ifm-color-danger-contrast-background);
+  border-radius: 6px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ifm-font-color-base);
+  background: var(--ifm-color-emphasis-200);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.cancelButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.publishButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--ifm-color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.publishButton:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+}
+
+.publishButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

@@ -5,7 +5,11 @@ const BUTTONDOWN_USERNAME = 'agentictinkering';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-export default function SubscribeForm(): React.ReactNode {
+type Props = {
+  variant?: 'full' | 'compact';
+};
+
+export default function SubscribeForm({variant = 'full'}: Props): React.ReactNode {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [status, setStatus] = useState<Status>('idle');
@@ -49,6 +53,63 @@ export default function SubscribeForm(): React.ReactNode {
     }
   };
 
+  const formContent =
+    status === 'success' ? (
+      <div className={styles.successMessage}>{message}</div>
+    ) : (
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name"
+          className={styles.input}
+          disabled={status === 'loading'}
+        />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          required
+          className={styles.input}
+          disabled={status === 'loading'}
+        />
+        <button
+          type="submit"
+          className={styles.button}
+          disabled={status === 'loading'}
+        >
+          {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+        </button>
+        {status === 'error' && (
+          <p className={styles.errorMessage}>{message}</p>
+        )}
+      </form>
+    );
+
+  const privacy = (
+    <p className={styles.privacy}>
+      Powered by{' '}
+      <a
+        href="https://buttondown.email"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Buttondown
+      </a>
+    </p>
+  );
+
+  if (variant === 'compact') {
+    return (
+      <div className={styles.compact}>
+        {formContent}
+        {privacy}
+      </div>
+    );
+  }
+
   return (
     <section className={styles.subscribeSection}>
       <div className="container">
@@ -57,50 +118,8 @@ export default function SubscribeForm(): React.ReactNode {
           Get notified when new content is published.
         </p>
 
-        {status === 'success' ? (
-          <div className={styles.successMessage}>{message}</div>
-        ) : (
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              className={styles.input}
-              disabled={status === 'loading'}
-            />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className={styles.input}
-              disabled={status === 'loading'}
-            />
-            <button
-              type="submit"
-              className={styles.button}
-              disabled={status === 'loading'}
-            >
-              {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
-            </button>
-            {status === 'error' && (
-              <p className={styles.errorMessage}>{message}</p>
-            )}
-          </form>
-        )}
-
-        <p className={styles.privacy}>
-          Powered by{' '}
-          <a
-            href="https://buttondown.email"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Buttondown
-          </a>
-        </p>
+        {formContent}
+        {privacy}
       </div>
     </section>
   );

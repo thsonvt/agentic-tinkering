@@ -1,7 +1,8 @@
-import React, {createContext, useContext, useState, useEffect, ReactNode} from 'react';
+import React, {createContext, useContext, ReactNode} from 'react';
+import {ConvexReactClient, useQuery, useConvexAuth} from 'convex/react';
+import {ConvexAuthProvider, useAuthActions} from '@convex-dev/auth/react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import {getSupabaseClient} from '@site/src/lib/supabase';
-import type {User as SupabaseUser, SupabaseClient} from '@supabase/supabase-js';
+import {api} from '../../convex/_generated/api';
 
 interface User {
   email: string;
@@ -19,89 +20,66 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function mapSupabaseUser(supabaseUser: SupabaseUser | null): User | null {
-  if (!supabaseUser) return null;
-  return {
-    email: supabaseUser.email || '',
-    user_metadata: {
-      full_name: supabaseUser.user_metadata?.full_name,
-    },
-  };
-}
+// Internal provider that uses Convex hooks
+function AuthContextInner({children}: {children: ReactNode}) {
+  const {isLoading, isAuthenticated} = useConvexAuth();
+  const {signOut} = useAuthActions();
+  const viewer = useQuery(api.users.viewer);
 
-export function AuthProvider({children}: {children: ReactNode}) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
-  const {siteConfig} = useDocusaurusContext();
+  const user: User | null =
+    isAuthenticated && viewer
+      ? {
+          email: viewer.email || '',
+          user_metadata: {
+            full_name: viewer.name,
+          },
+        }
+      : null;
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      setIsLoading(false);
-      return;
-    }
-
-    const {supabaseUrl, supabaseAnonKey} = siteConfig.customFields as {
-      supabaseUrl?: string;
-      supabaseAnonKey?: string;
-    };
-
-    const client = getSupabaseClient(supabaseUrl, supabaseAnonKey);
-    if (!client) {
-      setIsLoading(false);
-      return;
-    }
-
-    setSupabase(client);
-
-    // Get initial session
-    client.auth.getSession().then(({data: {session}}) => {
-      setUser(mapSupabaseUser(session?.user ?? null));
-      setIsLoading(false);
-    });
-
-    // Listen for auth changes
-    const {data: {subscription}} = client.auth.onAuthStateChange((_event, session) => {
-      setUser(mapSupabaseUser(session?.user ?? null));
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [siteConfig.customFields]);
-
-  const login = async () => {
-    if (!supabase) {
-      console.warn('Supabase not initialized');
-      return;
-    }
-
-    const email = window.prompt('Enter your email:');
-    if (!email) return;
-
-    const {error} = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
-    });
-
-    if (error) {
-      alert(`Login error: ${error.message}`);
-    } else {
-      alert('Check your email for a login link!');
-    }
+  const login = () => {
+    window.location.href = '/login';
   };
 
   const logout = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
+    await signOut();
   };
 
   return (
     <AuthContext.Provider value={{user, isLoading, login, logout}}>
       {children}
     </AuthContext.Provider>
+  );
+}
+
+// Singleton client outside component to persist across renders
+let convexClient: ConvexReactClient | null = null;
+
+function getClient(url: string): ConvexReactClient {
+  if (!convexClient) {
+    convexClient = new ConvexReactClient(url);
+  }
+  return convexClient;
+}
+
+export function AuthProvider({children}: {children: ReactNode}) {
+  const {siteConfig} = useDocusaurusContext();
+  const {convexUrl} = siteConfig.customFields as {convexUrl?: string};
+
+  // SSR check
+  if (typeof window === 'undefined' || !convexUrl) {
+    return (
+      <AuthContext.Provider value={{user: null, isLoading: false, login: () => {}, logout: () => {}}}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
+
+  const client = getClient(convexUrl);
+
+  return (
+    <ConvexAuthProvider client={client}>
+      <AuthContextInner>{children}</AuthContextInner>
+    </ConvexAuthProvider>
   );
 }
 

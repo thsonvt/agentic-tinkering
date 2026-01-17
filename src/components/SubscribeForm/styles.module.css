@@ -91,3 +91,7 @@
 .privacy a {
   color: var(--ifm-color-primary);
 }
+
+.compact {
+  text-align: center;
+}
