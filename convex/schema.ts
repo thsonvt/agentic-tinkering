@@ -46,6 +46,22 @@ const schema = defineSchema({
     .index('by_status_type', ['status', 'contentType'])
     .index('by_slug', ['slug'])
     .index('by_published_date', ['status', 'contentType', 'publishedAt']),
+
+  // Web captures from Chrome extension
+  webCaptures: defineTable({
+    userId: v.id('users'),
+    url: v.string(),
+    canonicalUrl: v.string(),
+    title: v.string(),
+    content: v.string(),
+    excerpt: v.optional(v.string()),
+    siteName: v.optional(v.string()),
+    capturedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_user_url', ['userId', 'canonicalUrl'])
+    .index('by_user_updated', ['userId', 'updatedAt']),
 });
 
 export default schema;
