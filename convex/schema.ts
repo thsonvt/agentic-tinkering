@@ -62,6 +62,27 @@ const schema = defineSchema({
     .index('by_user', ['userId'])
     .index('by_user_url', ['userId', 'canonicalUrl'])
     .index('by_user_updated', ['userId', 'updatedAt']),
+
+  // Highlights for content and web captures
+  highlights: defineTable({
+    userId: v.id('users'),
+    contentId: v.optional(v.id('content')),
+    webCaptureId: v.optional(v.id('webCaptures')),
+    text: v.string(),
+    color: v.union(
+      v.literal('yellow'),
+      v.literal('green'),
+      v.literal('blue'),
+      v.literal('pink')
+    ),
+    startOffset: v.number(),
+    endOffset: v.number(),
+    createdAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_content', ['contentId'])
+    .index('by_web_capture', ['webCaptureId'])
+    .index('by_user_color', ['userId', 'color']),
 });
 
 export default schema;
