@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from '@docusaurus/Link';
 import { useLocation, useHistory } from '@docusaurus/router';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 import ProtectedContent from '@site/src/components/ProtectedContent';
@@ -31,8 +31,6 @@ export default function DraftsContent() {
   const drafts = useQuery(api.content.list, { status: 'draft' });
   const published = useQuery(api.content.list, { status: 'published' });
   const captures = useQuery(api.webCaptures.list);
-  const debugData = useQuery(api.webCaptures.debugListAll);
-  const migrateUserId = useMutation(api.webCaptures.migrateUserId);
   const [showPdfImport, setShowPdfImport] = useState(false);
   const [showUrlImport, setShowUrlImport] = useState(false);
   const [showPublished, setShowPublished] = useState(false);
@@ -203,44 +201,6 @@ export default function DraftsContent() {
         {activeTab === 'captures' && (
           <>
             <h2 className={styles.sectionTitle}>Web Captures</h2>
-
-            {/* Debug section - remove after fixing */}
-            {debugData && (
-              <div style={{ background: '#fff3cd', padding: '1rem', marginBottom: '1rem', borderRadius: '8px', fontSize: '0.85rem' }}>
-                <strong>Debug Info:</strong>
-                <br />Current userId: <code>{debugData.currentUserId || 'null'}</code>
-                {debugData.authAccount && (
-                  <>
-                    <br />Auth provider: <code>{debugData.authAccount.provider}</code>
-                    <br />providerAccountId: <code>{debugData.authAccount.providerAccountId}</code>
-                  </>
-                )}
-                <br />Total captures in DB: {debugData.captures.length}
-
-                {/* Migration button */}
-                {debugData.captures.some(c => !c.matchesCurrentUser) && (
-                  <button
-                    onClick={async () => {
-                      const oldUserId = debugData.captures.find(c => !c.matchesCurrentUser)?.storedUserId;
-                      if (oldUserId) {
-                        const result = await migrateUserId({ oldUserId });
-                        alert(`Migrated ${result.updated} captures to userId: ${result.newUserId}`);
-                      }
-                    }}
-                    style={{ marginTop: '0.5rem', padding: '0.5rem 1rem', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                    🔧 Migrate captures to current userId
-                  </button>
-                )}
-
-                {debugData.captures.map((c, i) => (
-                  <div key={i} style={{ marginTop: '0.5rem', padding: '0.5rem', background: (c.matchesCurrentUser || c.matchesProviderAccountId) ? '#d4edda' : '#f8d7da', borderRadius: '4px' }}>
-                    <strong>{c.title}</strong>
-                    <br />Stored userId: <code>{c.storedUserId}</code>
-                    <br />Matches: {c.matchesCurrentUser ? '✅' : '❌'}
-                  </div>
-                ))}
-              </div>
-            )}
 
             {captures === undefined ? (
               <p className={styles.loading}>Loading captures...</p>

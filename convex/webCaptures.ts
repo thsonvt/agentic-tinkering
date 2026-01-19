@@ -177,69 +177,6 @@ export const list = query({
   },
 });
 
-/**
- * Debug: List all web captures without filtering (to diagnose userId mismatch)
- */
-export const debugListAll = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-
-    // Get auth account info to see what fields are available
-    const authAccount = await ctx.db
-      .query('authAccounts')
-      .withIndex('userIdAndProvider', (q) => q.eq('userId', userId!))
-      .first();
-
-    const allCaptures = await ctx.db.query('webCaptures').collect();
-
-    return {
-      currentUserId: userId,
-      authAccount: authAccount ? {
-        provider: authAccount.provider,
-        providerAccountId: authAccount.providerAccountId,
-        // Show all fields to understand the structure
-        allFields: Object.keys(authAccount),
-      } : null,
-      captures: allCaptures.map(c => ({
-        _id: c._id,
-        title: c.title,
-        storedUserId: c.userId,
-        matchesCurrentUser: c.userId === userId,
-        matchesProviderAccountId: c.userId === authAccount?.providerAccountId,
-      })),
-    };
-  },
-});
-
-/**
- * Migrate webCaptures from old userId format to current Convex userId
- * Call this once to fix existing data
- */
-export const migrateUserId = mutation({
-  args: {
-    oldUserId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error('Not authenticated');
-
-    // Find all captures with the old userId
-    const captures = await ctx.db
-      .query('webCaptures')
-      .withIndex('by_user', (q) => q.eq('userId', args.oldUserId))
-      .collect();
-
-    // Update each capture to use the current Convex userId
-    let updated = 0;
-    for (const capture of captures) {
-      await ctx.db.patch(capture._id, { userId });
-      updated++;
-    }
-
-    return { updated, newUserId: userId };
-  },
-});
 
 /**
  * Delete a web capture and its highlights
