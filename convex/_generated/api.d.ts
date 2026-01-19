@@ -12,9 +12,11 @@ import type * as ResendOTP from "../ResendOTP.js";
 import type * as auth from "../auth.js";
 import type * as content from "../content.js";
 import type * as drafts from "../drafts.js";
+import type * as highlights from "../highlights.js";
 import type * as http from "../http.js";
 import type * as references from "../references.js";
 import type * as users from "../users.js";
+import type * as webCaptures from "../webCaptures.js";
 
 import type {
   ApiFromModules,
@@ -27,9 +29,11 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   content: typeof content;
   drafts: typeof drafts;
+  highlights: typeof highlights;
   http: typeof http;
   references: typeof references;
   users: typeof users;
+  webCaptures: typeof webCaptures;
 }>;
 
 /**

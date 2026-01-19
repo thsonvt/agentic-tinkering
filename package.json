@@ -10,6 +10,8 @@
     "start:fresh": "npm run clear && npm run start",
     "prebuild": "npm run sync-content -- --require",
     "build": "docusaurus build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -44,7 +46,12 @@
     "@docusaurus/module-type-aliases": "3.9.2",
     "@docusaurus/tsconfig": "3.9.2",
     "@docusaurus/types": "3.9.2",
-    "typescript": "~5.6.2"
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "jsdom": "^26.0.0",
+    "typescript": "~5.6.2",
+    "vitest": "^2.1.8"
   },
   "browserslist": {
     "production": [

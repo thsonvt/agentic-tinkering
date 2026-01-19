@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import styles from '@site/src/pages/posts/styles.module.css';
 import YouTubeEmbed from '@site/src/components/YouTubeEmbed';
+import ReadingFocusToggle from '@site/src/components/ReadingFocusToggle';
 import clsx from 'clsx';
 
 function isYouTubeUrl(url: string): boolean {
@@ -160,7 +161,10 @@ export default function PostContent() {
         ) : (
           <article className={styles.container}>
             <header className={styles.postHeader}>
-              <h1>{post.title}</h1>
+              <div className={styles.headerTopRow}>
+                <h1>{post.title}</h1>
+                <ReadingFocusToggle />
+              </div>
               <div className={styles.headerMeta}>
                 <span className={styles.date}>
                   {new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
@@ -184,7 +188,7 @@ export default function PostContent() {
               {post.description && <p className={styles.description}>{post.description}</p>}
             </header>
 
-            <div className={styles.content}>
+            <div className={styles.content} data-focus-scope="content">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -193,7 +197,67 @@ export default function PostContent() {
                     if (url && isYouTubeUrl(url)) {
                       return <YouTubeEmbed url={url} />;
                     }
-                    return <p {...props}>{children}</p>;
+                    return (
+                      <p data-focus-block="true" {...props}>
+                        {children}
+                      </p>
+                    );
+                  },
+                  li({children, ...props}) {
+                    return (
+                      <li data-focus-block="true" {...props}>
+                        {children}
+                      </li>
+                    );
+                  },
+                  blockquote({children, ...props}) {
+                    return (
+                      <blockquote data-focus-block="true" {...props}>
+                        {children}
+                      </blockquote>
+                    );
+                  },
+                  h1({children, ...props}) {
+                    return (
+                      <h1 data-focus-block="true" {...props}>
+                        {children}
+                      </h1>
+                    );
+                  },
+                  h2({children, ...props}) {
+                    return (
+                      <h2 data-focus-block="true" {...props}>
+                        {children}
+                      </h2>
+                    );
+                  },
+                  h3({children, ...props}) {
+                    return (
+                      <h3 data-focus-block="true" {...props}>
+                        {children}
+                      </h3>
+                    );
+                  },
+                  h4({children, ...props}) {
+                    return (
+                      <h4 data-focus-block="true" {...props}>
+                        {children}
+                      </h4>
+                    );
+                  },
+                  h5({children, ...props}) {
+                    return (
+                      <h5 data-focus-block="true" {...props}>
+                        {children}
+                      </h5>
+                    );
+                  },
+                  h6({children, ...props}) {
+                    return (
+                      <h6 data-focus-block="true" {...props}>
+                        {children}
+                      </h6>
+                    );
                   },
                 }}
               >
