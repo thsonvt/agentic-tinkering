@@ -143,15 +143,29 @@ export const debugListAll = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
+
+    // Get auth account info to see what fields are available
+    const authAccount = await ctx.db
+      .query('authAccounts')
+      .withIndex('userIdAndProvider', (q) => q.eq('userId', userId!))
+      .first();
+
     const allCaptures = await ctx.db.query('webCaptures').collect();
 
     return {
       currentUserId: userId,
+      authAccount: authAccount ? {
+        provider: authAccount.provider,
+        providerAccountId: authAccount.providerAccountId,
+        // Show all fields to understand the structure
+        allFields: Object.keys(authAccount),
+      } : null,
       captures: allCaptures.map(c => ({
         _id: c._id,
         title: c.title,
         storedUserId: c.userId,
         matchesCurrentUser: c.userId === userId,
+        matchesProviderAccountId: c.userId === authAccount?.providerAccountId,
       })),
     };
   },
