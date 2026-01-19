@@ -31,6 +31,7 @@ export default function DraftsContent() {
   const drafts = useQuery(api.content.list, { status: 'draft' });
   const published = useQuery(api.content.list, { status: 'published' });
   const captures = useQuery(api.webCaptures.list);
+  const debugData = useQuery(api.webCaptures.debugListAll);
   const [showPdfImport, setShowPdfImport] = useState(false);
   const [showUrlImport, setShowUrlImport] = useState(false);
   const [showPublished, setShowPublished] = useState(false);
@@ -201,6 +202,23 @@ export default function DraftsContent() {
         {activeTab === 'captures' && (
           <>
             <h2 className={styles.sectionTitle}>Web Captures</h2>
+
+            {/* Debug section - remove after fixing */}
+            {debugData && (
+              <div style={{ background: '#fff3cd', padding: '1rem', marginBottom: '1rem', borderRadius: '8px', fontSize: '0.85rem' }}>
+                <strong>Debug Info:</strong>
+                <br />Current userId: <code>{debugData.currentUserId || 'null'}</code>
+                <br />Total captures in DB: {debugData.captures.length}
+                {debugData.captures.map((c, i) => (
+                  <div key={i} style={{ marginTop: '0.5rem', padding: '0.5rem', background: c.matchesCurrentUser ? '#d4edda' : '#f8d7da', borderRadius: '4px' }}>
+                    <strong>{c.title}</strong>
+                    <br />Stored userId: <code>{c.storedUserId}</code>
+                    <br />Matches: {c.matchesCurrentUser ? '✅ Yes' : '❌ No'}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {captures === undefined ? (
               <p className={styles.loading}>Loading captures...</p>
             ) : captures.length === 0 ? (

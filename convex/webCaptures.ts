@@ -91,6 +91,7 @@ export const getByUrl = query({
 
 /**
  * List all web captures for the current user
+ * Supports both Convex user IDs and Google OAuth IDs for backward compatibility
  */
 export const list = query({
   args: {},
@@ -98,11 +99,61 @@ export const list = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    return await ctx.db
+    // Get the user's OAuth provider ID (Google sub claim) from authAccounts
+    const authAccount = await ctx.db
+      .query('authAccounts')
+      .withIndex('userIdAndProvider', (q) => q.eq('userId', userId))
+      .first();
+
+    const providerAccountId = authAccount?.providerAccountId;
+
+    // Query by Convex user ID first
+    const capturesByConvexId = await ctx.db
       .query('webCaptures')
       .withIndex('by_user_updated', (q) => q.eq('userId', userId))
       .order('desc')
       .collect();
+
+    // Also query by OAuth provider ID if different (backward compatibility)
+    let capturesByProviderId: typeof capturesByConvexId = [];
+    if (providerAccountId && providerAccountId !== userId) {
+      capturesByProviderId = await ctx.db
+        .query('webCaptures')
+        .withIndex('by_user_updated', (q) => q.eq('userId', providerAccountId))
+        .order('desc')
+        .collect();
+    }
+
+    // Merge and deduplicate by _id
+    const allCaptures = [...capturesByConvexId, ...capturesByProviderId];
+    const uniqueCaptures = allCaptures.filter(
+      (capture, index, self) =>
+        index === self.findIndex((c) => c._id === capture._id)
+    );
+
+    // Sort by updatedAt descending
+    return uniqueCaptures.sort((a, b) => b.updatedAt - a.updatedAt);
+  },
+});
+
+/**
+ * Debug: List all web captures without filtering (to diagnose userId mismatch)
+ */
+export const debugListAll = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    const allCaptures = await ctx.db.query('webCaptures').collect();
+
+    return {
+      currentUserId: userId,
+      captures: allCaptures.map(c => ({
+        _id: c._id,
+        title: c.title,
+        storedUserId: c.userId,
+        matchesCurrentUser: c.userId === userId,
+      })),
+    };
   },
 });
 
