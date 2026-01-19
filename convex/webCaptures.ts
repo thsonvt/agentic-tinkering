@@ -91,7 +91,8 @@ export const getByUrl = query({
 
 /**
  * List all web captures for the current user
- * Supports both Convex user IDs and Google OAuth IDs for backward compatibility
+ * Supports multiple auth providers (Google OAuth, email OTP, etc.)
+ * Handles case where user has different auth methods with different IDs
  */
 export const list = query({
   args: {},
@@ -99,39 +100,79 @@ export const list = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    // Get the user's OAuth provider ID (Google sub claim) from authAccounts
-    const authAccount = await ctx.db
+    // Get current user's auth accounts
+    const currentUserAccounts = await ctx.db
       .query('authAccounts')
       .withIndex('userIdAndProvider', (q) => q.eq('userId', userId))
-      .first();
-
-    const providerAccountId = authAccount?.providerAccountId;
-
-    // Query by Convex user ID first
-    const capturesByConvexId = await ctx.db
-      .query('webCaptures')
-      .withIndex('by_user_updated', (q) => q.eq('userId', userId))
-      .order('desc')
       .collect();
 
-    // Also query by OAuth provider ID if different (backward compatibility)
-    let capturesByProviderId: typeof capturesByConvexId = [];
-    if (providerAccountId && providerAccountId !== userId) {
-      capturesByProviderId = await ctx.db
-        .query('webCaptures')
-        .withIndex('by_user_updated', (q) => q.eq('userId', providerAccountId))
-        .order('desc')
-        .collect();
+    // Get the user's email from their accounts
+    const userEmail = currentUserAccounts.find(a =>
+      a.providerAccountId?.includes('@')
+    )?.providerAccountId;
+
+    // Collect all possible user identifiers
+    const userIdentifiers = new Set<string>([userId]);
+
+    // Add all providerAccountIds from current user's accounts
+    for (const account of currentUserAccounts) {
+      if (account.providerAccountId) {
+        userIdentifiers.add(account.providerAccountId);
+      }
     }
 
-    // Merge and deduplicate by _id
-    const allCaptures = [...capturesByConvexId, ...capturesByProviderId];
+    // If we have an email, find ALL authAccounts with that email
+    // This handles Google OAuth accounts that may have different userId
+    if (userEmail) {
+      const allAccountsWithEmail = await ctx.db
+        .query('authAccounts')
+        .filter((q) => q.eq(q.field('providerAccountId'), userEmail))
+        .collect();
+
+      for (const account of allAccountsWithEmail) {
+        userIdentifiers.add(account.userId);
+        // Also check for Google accounts linked to same user
+        const linkedAccounts = await ctx.db
+          .query('authAccounts')
+          .withIndex('userIdAndProvider', (q) => q.eq('userId', account.userId))
+          .collect();
+        for (const linked of linkedAccounts) {
+          if (linked.providerAccountId) {
+            userIdentifiers.add(linked.providerAccountId);
+          }
+        }
+      }
+    }
+
+    // Query captures for each identifier and merge
+    type WebCapture = {
+      _id: any;
+      _creationTime: number;
+      userId: string;
+      url: string;
+      canonicalUrl: string;
+      title: string;
+      content: string;
+      excerpt?: string;
+      siteName?: string;
+      capturedAt: number;
+      updatedAt: number;
+    };
+    const allCaptures: WebCapture[] = [];
+    for (const identifier of userIdentifiers) {
+      const captures = await ctx.db
+        .query('webCaptures')
+        .withIndex('by_user_updated', (q) => q.eq('userId', identifier))
+        .collect();
+      allCaptures.push(...captures);
+    }
+
+    // Deduplicate by _id and sort by updatedAt descending
     const uniqueCaptures = allCaptures.filter(
       (capture, index, self) =>
         index === self.findIndex((c) => c._id === capture._id)
     );
 
-    // Sort by updatedAt descending
     return uniqueCaptures.sort((a, b) => b.updatedAt - a.updatedAt);
   },
 });
@@ -168,6 +209,35 @@ export const debugListAll = query({
         matchesProviderAccountId: c.userId === authAccount?.providerAccountId,
       })),
     };
+  },
+});
+
+/**
+ * Migrate webCaptures from old userId format to current Convex userId
+ * Call this once to fix existing data
+ */
+export const migrateUserId = mutation({
+  args: {
+    oldUserId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error('Not authenticated');
+
+    // Find all captures with the old userId
+    const captures = await ctx.db
+      .query('webCaptures')
+      .withIndex('by_user', (q) => q.eq('userId', args.oldUserId))
+      .collect();
+
+    // Update each capture to use the current Convex userId
+    let updated = 0;
+    for (const capture of captures) {
+      await ctx.db.patch(capture._id, { userId });
+      updated++;
+    }
+
+    return { updated, newUserId: userId };
   },
 });
 
