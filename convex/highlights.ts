@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { getAuthUserId } from '@convex-dev/auth/server';
+import { getCanonicalUserId } from './authHelpers';
 
 const highlightColorValidator = v.union(
   v.literal('yellow'),
@@ -22,7 +22,7 @@ export const create = mutation({
     endOffset: v.number(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getCanonicalUserId(ctx);
     if (!userId) throw new Error('Not authenticated');
 
     // Must have either contentId or webCaptureId
@@ -60,7 +60,7 @@ export const batchCreate = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getCanonicalUserId(ctx);
     if (!userId) throw new Error('Not authenticated');
 
     const ids = [];
@@ -86,7 +86,7 @@ export const batchCreate = mutation({
 export const remove = mutation({
   args: { id: v.id('highlights') },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getCanonicalUserId(ctx);
     if (!userId) throw new Error('Not authenticated');
 
     const highlight = await ctx.db.get(args.id);
@@ -104,7 +104,7 @@ export const remove = mutation({
 export const listByWebCapture = query({
   args: { webCaptureId: v.id('webCaptures') },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getCanonicalUserId(ctx);
     if (!userId) return [];
 
     return await ctx.db
@@ -120,7 +120,7 @@ export const listByWebCapture = query({
 export const listByContent = query({
   args: { contentId: v.id('content') },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getCanonicalUserId(ctx);
     if (!userId) return [];
 
     return await ctx.db
@@ -138,7 +138,7 @@ export const listAll = query({
     color: v.optional(highlightColorValidator),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getCanonicalUserId(ctx);
     if (!userId) return [];
 
     let highlights;
