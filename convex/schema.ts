@@ -49,7 +49,7 @@ const schema = defineSchema({
 
   // Web captures from Chrome extension
   webCaptures: defineTable({
-    userId: v.string(),
+    userId: v.id('users'),
     url: v.string(),
     canonicalUrl: v.string(),
     title: v.string(),
@@ -65,7 +65,7 @@ const schema = defineSchema({
 
   // Highlights for content and web captures
   highlights: defineTable({
-    userId: v.string(),
+    userId: v.id('users'),
     contentId: v.optional(v.id('content')),
     webCaptureId: v.optional(v.id('webCaptures')),
     text: v.string(),
